@@ -1,0 +1,11 @@
+openmc-runs*/
+*.h5
+*.log
+*.gui-run.log
+__pycache__/
+logs/
+ISO*
+!ISOAA-explicit
+!ISOAA-explicit.flux.json
+!ISOAA-homogenized
+!ISOAA-homogenized.flux.json

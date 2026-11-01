@@ -1,0 +1,864 @@
+# MHTGR-350 benchmark core (NEA/NSC/R(2017)4): fresh fuel, 20 C isothermal, rods withdrawn.
+# Variant: the burnable poison grains hold no boron.
+# Written by generate.py; edit that, not this.
+nuclide flags:
+    U235: {burn: false, xs: true}
+    U238: {burn: false, xs: true}
+    O: {burn: false, xs: true}
+    C: {burn: false, xs: true}
+    SI: {burn: false, xs: true}
+    B10: {burn: false, xs: true}
+    B11: {burn: false, xs: true}
+    HE4: {burn: false, xs: true}
+custom isotopics:
+    MHTGR kernel:
+        input format: number densities
+        U235: 3.702300e-03
+        U238: 1.992856e-02
+        C: 1.181543e-02
+        O: 3.544629e-02
+    buffer carbon:
+        input format: number densities
+        C: 5.013855e-02
+    PyC:
+        input format: number densities
+        C: 9.526324e-02
+    TRISO SiC:
+        input format: number densities
+        SI: 4.806118e-02
+        C: 4.806118e-02
+    compact matrix:
+        input format: number densities
+        C: 8.724107e-02
+    block graphite:
+        input format: number densities
+        C: 9.275631e-02
+        B10: 2.973568e-08
+    reflector graphite:
+        input format: number densities
+        C: 8.624650e-02
+        B10: 2.764900e-08
+    B4C grains:
+        input format: number densities
+        C: 2.692008e-02
+    LBP buffer:
+        input format: number densities
+        C: 5.013855e-02
+    LBP PyC:
+        input format: number densities
+        C: 9.375908e-02
+    LBP matrix:
+        input format: number densities
+        C: 4.713023e-02
+particles:
+    TRISO:
+        kernel: {material: UCO, isotopics: MHTGR kernel, od: 0.0425, flags: fuel depletable}
+        buffer: {material: Graphite, isotopics: buffer carbon, od: 0.0625}
+        inner PyC: {material: Graphite, isotopics: PyC, od: 0.0695}
+        SiC: {material: SiC, isotopics: TRISO SiC, od: 0.0765}
+        outer PyC: {material: Graphite, isotopics: PyC, od: 0.0845}
+    B4C grain:
+        # ARMI's B4C expansion is only defined from 25 C; the grains sit at 25 C instead of 20.
+        B4C kernel: {material: B4C, isotopics: B4C grains, od: 0.0200, flags: poison, Tinput: 25.0, Thot: 25.0}
+        B4C buffer: {material: Graphite, isotopics: LBP buffer, od: 0.0236}
+        B4C PyC: {material: Graphite, isotopics: LBP PyC, od: 0.0282}
+blocks:
+    fuel: &block_fuel
+        grid name: standard element
+        fuel compact:
+            shape: Circle
+            material: Graphite
+            isotopics: compact matrix
+            Tinput: 20.0
+            Thot: 20.0
+            od: 1.245
+            latticeIDs: [F]
+            particles: TRISO
+            packingFraction: 0.35
+            flags: fuel
+        fuel gap:
+            shape: Circle
+            material: Helium
+            Tinput: 20.0
+            Thot: 20.0
+            id: fuel compact.od
+            od: 1.27
+            latticeIDs: [F]
+        LBP compact:
+            shape: Circle
+            material: Graphite
+            isotopics: LBP matrix
+            Tinput: 20.0
+            Thot: 20.0
+            od: 1.143
+            latticeIDs: [L]
+            particles: B4C grain
+            packingFraction: 0.109
+            flags: poison
+        LBP gap:
+            shape: Circle
+            material: Helium
+            Tinput: 20.0
+            Thot: 20.0
+            id: LBP compact.od
+            od: 1.27
+            latticeIDs: [L]
+        coolant:
+            shape: Circle
+            material: Helium
+            Tinput: 20.0
+            Thot: 20.0
+            od: 1.588
+            latticeIDs: [C]
+        small coolant:
+            shape: Circle
+            material: Helium
+            Tinput: 20.0
+            Thot: 20.0
+            od: 1.27
+            latticeIDs: [S]
+        block graphite:
+            shape: DerivedShape
+            material: Graphite
+            isotopics: block graphite
+            Tinput: 20.0
+            Thot: 20.0
+        outline:
+            shape: Hexagon
+            material: Void
+            Tinput: 20.0
+            Thot: 20.0
+            ip: 36.0
+            op: 36.0
+    RSC fuel 0: &block_RSC_fuel_0
+        grid name: RSC element 0
+        fuel compact:
+            shape: Circle
+            material: Graphite
+            isotopics: compact matrix
+            Tinput: 20.0
+            Thot: 20.0
+            od: 1.245
+            latticeIDs: [F]
+            particles: TRISO
+            packingFraction: 0.35
+            flags: fuel
+        fuel gap:
+            shape: Circle
+            material: Helium
+            Tinput: 20.0
+            Thot: 20.0
+            id: fuel compact.od
+            od: 1.27
+            latticeIDs: [F]
+        LBP compact:
+            shape: Circle
+            material: Graphite
+            isotopics: LBP matrix
+            Tinput: 20.0
+            Thot: 20.0
+            od: 1.143
+            latticeIDs: [L]
+            particles: B4C grain
+            packingFraction: 0.109
+            flags: poison
+        LBP gap:
+            shape: Circle
+            material: Helium
+            Tinput: 20.0
+            Thot: 20.0
+            id: LBP compact.od
+            od: 1.27
+            latticeIDs: [L]
+        coolant:
+            shape: Circle
+            material: Helium
+            Tinput: 20.0
+            Thot: 20.0
+            od: 1.588
+            latticeIDs: [C]
+        small coolant:
+            shape: Circle
+            material: Helium
+            Tinput: 20.0
+            Thot: 20.0
+            od: 1.27
+            latticeIDs: [S]
+        RSC channel:
+            shape: Circle
+            material: Helium
+            Tinput: 20.0
+            Thot: 20.0
+            od: 9.525
+            origin: [-8.4490, -4.8780]
+        block graphite:
+            shape: DerivedShape
+            material: Graphite
+            isotopics: block graphite
+            Tinput: 20.0
+            Thot: 20.0
+        outline:
+            shape: Hexagon
+            material: Void
+            Tinput: 20.0
+            Thot: 20.0
+            ip: 36.0
+            op: 36.0
+    RSC fuel 60: &block_RSC_fuel_60
+        grid name: RSC element 60
+        fuel compact:
+            shape: Circle
+            material: Graphite
+            isotopics: compact matrix
+            Tinput: 20.0
+            Thot: 20.0
+            od: 1.245
+            latticeIDs: [F]
+            particles: TRISO
+            packingFraction: 0.35
+            flags: fuel
+        fuel gap:
+            shape: Circle
+            material: Helium
+            Tinput: 20.0
+            Thot: 20.0
+            id: fuel compact.od
+            od: 1.27
+            latticeIDs: [F]
+        LBP compact:
+            shape: Circle
+            material: Graphite
+            isotopics: LBP matrix
+            Tinput: 20.0
+            Thot: 20.0
+            od: 1.143
+            latticeIDs: [L]
+            particles: B4C grain
+            packingFraction: 0.109
+            flags: poison
+        LBP gap:
+            shape: Circle
+            material: Helium
+            Tinput: 20.0
+            Thot: 20.0
+            id: LBP compact.od
+            od: 1.27
+            latticeIDs: [L]
+        coolant:
+            shape: Circle
+            material: Helium
+            Tinput: 20.0
+            Thot: 20.0
+            od: 1.588
+            latticeIDs: [C]
+        small coolant:
+            shape: Circle
+            material: Helium
+            Tinput: 20.0
+            Thot: 20.0
+            od: 1.27
+            latticeIDs: [S]
+        RSC channel:
+            shape: Circle
+            material: Helium
+            Tinput: 20.0
+            Thot: 20.0
+            od: 9.525
+            origin: [-0.0000, -9.7560]
+        block graphite:
+            shape: DerivedShape
+            material: Graphite
+            isotopics: block graphite
+            Tinput: 20.0
+            Thot: 20.0
+        outline:
+            shape: Hexagon
+            material: Void
+            Tinput: 20.0
+            Thot: 20.0
+            ip: 36.0
+            op: 36.0
+    RSC fuel 120: &block_RSC_fuel_120
+        grid name: RSC element 120
+        fuel compact:
+            shape: Circle
+            material: Graphite
+            isotopics: compact matrix
+            Tinput: 20.0
+            Thot: 20.0
+            od: 1.245
+            latticeIDs: [F]
+            particles: TRISO
+            packingFraction: 0.35
+            flags: fuel
+        fuel gap:
+            shape: Circle
+            material: Helium
+            Tinput: 20.0
+            Thot: 20.0
+            id: fuel compact.od
+            od: 1.27
+            latticeIDs: [F]
+        LBP compact:
+            shape: Circle
+            material: Graphite
+            isotopics: LBP matrix
+            Tinput: 20.0
+            Thot: 20.0
+            od: 1.143
+            latticeIDs: [L]
+            particles: B4C grain
+            packingFraction: 0.109
+            flags: poison
+        LBP gap:
+            shape: Circle
+            material: Helium
+            Tinput: 20.0
+            Thot: 20.0
+            id: LBP compact.od
+            od: 1.27
+            latticeIDs: [L]
+        coolant:
+            shape: Circle
+            material: Helium
+            Tinput: 20.0
+            Thot: 20.0
+            od: 1.588
+            latticeIDs: [C]
+        small coolant:
+            shape: Circle
+            material: Helium
+            Tinput: 20.0
+            Thot: 20.0
+            od: 1.27
+            latticeIDs: [S]
+        RSC channel:
+            shape: Circle
+            material: Helium
+            Tinput: 20.0
+            Thot: 20.0
+            od: 9.525
+            origin: [8.4490, -4.8780]
+        block graphite:
+            shape: DerivedShape
+            material: Graphite
+            isotopics: block graphite
+            Tinput: 20.0
+            Thot: 20.0
+        outline:
+            shape: Hexagon
+            material: Void
+            Tinput: 20.0
+            Thot: 20.0
+            ip: 36.0
+            op: 36.0
+    RSC fuel 180: &block_RSC_fuel_180
+        grid name: RSC element 180
+        fuel compact:
+            shape: Circle
+            material: Graphite
+            isotopics: compact matrix
+            Tinput: 20.0
+            Thot: 20.0
+            od: 1.245
+            latticeIDs: [F]
+            particles: TRISO
+            packingFraction: 0.35
+            flags: fuel
+        fuel gap:
+            shape: Circle
+            material: Helium
+            Tinput: 20.0
+            Thot: 20.0
+            id: fuel compact.od
+            od: 1.27
+            latticeIDs: [F]
+        LBP compact:
+            shape: Circle
+            material: Graphite
+            isotopics: LBP matrix
+            Tinput: 20.0
+            Thot: 20.0
+            od: 1.143
+            latticeIDs: [L]
+            particles: B4C grain
+            packingFraction: 0.109
+            flags: poison
+        LBP gap:
+            shape: Circle
+            material: Helium
+            Tinput: 20.0
+            Thot: 20.0
+            id: LBP compact.od
+            od: 1.27
+            latticeIDs: [L]
+        coolant:
+            shape: Circle
+            material: Helium
+            Tinput: 20.0
+            Thot: 20.0
+            od: 1.588
+            latticeIDs: [C]
+        small coolant:
+            shape: Circle
+            material: Helium
+            Tinput: 20.0
+            Thot: 20.0
+            od: 1.27
+            latticeIDs: [S]
+        RSC channel:
+            shape: Circle
+            material: Helium
+            Tinput: 20.0
+            Thot: 20.0
+            od: 9.525
+            origin: [8.4490, 4.8780]
+        block graphite:
+            shape: DerivedShape
+            material: Graphite
+            isotopics: block graphite
+            Tinput: 20.0
+            Thot: 20.0
+        outline:
+            shape: Hexagon
+            material: Void
+            Tinput: 20.0
+            Thot: 20.0
+            ip: 36.0
+            op: 36.0
+    RSC fuel 240: &block_RSC_fuel_240
+        grid name: RSC element 240
+        fuel compact:
+            shape: Circle
+            material: Graphite
+            isotopics: compact matrix
+            Tinput: 20.0
+            Thot: 20.0
+            od: 1.245
+            latticeIDs: [F]
+            particles: TRISO
+            packingFraction: 0.35
+            flags: fuel
+        fuel gap:
+            shape: Circle
+            material: Helium
+            Tinput: 20.0
+            Thot: 20.0
+            id: fuel compact.od
+            od: 1.27
+            latticeIDs: [F]
+        LBP compact:
+            shape: Circle
+            material: Graphite
+            isotopics: LBP matrix
+            Tinput: 20.0
+            Thot: 20.0
+            od: 1.143
+            latticeIDs: [L]
+            particles: B4C grain
+            packingFraction: 0.109
+            flags: poison
+        LBP gap:
+            shape: Circle
+            material: Helium
+            Tinput: 20.0
+            Thot: 20.0
+            id: LBP compact.od
+            od: 1.27
+            latticeIDs: [L]
+        coolant:
+            shape: Circle
+            material: Helium
+            Tinput: 20.0
+            Thot: 20.0
+            od: 1.588
+            latticeIDs: [C]
+        small coolant:
+            shape: Circle
+            material: Helium
+            Tinput: 20.0
+            Thot: 20.0
+            od: 1.27
+            latticeIDs: [S]
+        RSC channel:
+            shape: Circle
+            material: Helium
+            Tinput: 20.0
+            Thot: 20.0
+            od: 9.525
+            origin: [0.0000, 9.7560]
+        block graphite:
+            shape: DerivedShape
+            material: Graphite
+            isotopics: block graphite
+            Tinput: 20.0
+            Thot: 20.0
+        outline:
+            shape: Hexagon
+            material: Void
+            Tinput: 20.0
+            Thot: 20.0
+            ip: 36.0
+            op: 36.0
+    RSC fuel 300: &block_RSC_fuel_300
+        grid name: RSC element 300
+        fuel compact:
+            shape: Circle
+            material: Graphite
+            isotopics: compact matrix
+            Tinput: 20.0
+            Thot: 20.0
+            od: 1.245
+            latticeIDs: [F]
+            particles: TRISO
+            packingFraction: 0.35
+            flags: fuel
+        fuel gap:
+            shape: Circle
+            material: Helium
+            Tinput: 20.0
+            Thot: 20.0
+            id: fuel compact.od
+            od: 1.27
+            latticeIDs: [F]
+        LBP compact:
+            shape: Circle
+            material: Graphite
+            isotopics: LBP matrix
+            Tinput: 20.0
+            Thot: 20.0
+            od: 1.143
+            latticeIDs: [L]
+            particles: B4C grain
+            packingFraction: 0.109
+            flags: poison
+        LBP gap:
+            shape: Circle
+            material: Helium
+            Tinput: 20.0
+            Thot: 20.0
+            id: LBP compact.od
+            od: 1.27
+            latticeIDs: [L]
+        coolant:
+            shape: Circle
+            material: Helium
+            Tinput: 20.0
+            Thot: 20.0
+            od: 1.588
+            latticeIDs: [C]
+        small coolant:
+            shape: Circle
+            material: Helium
+            Tinput: 20.0
+            Thot: 20.0
+            od: 1.27
+            latticeIDs: [S]
+        RSC channel:
+            shape: Circle
+            material: Helium
+            Tinput: 20.0
+            Thot: 20.0
+            od: 9.525
+            origin: [-8.4490, 4.8780]
+        block graphite:
+            shape: DerivedShape
+            material: Graphite
+            isotopics: block graphite
+            Tinput: 20.0
+            Thot: 20.0
+        outline:
+            shape: Hexagon
+            material: Void
+            Tinput: 20.0
+            Thot: 20.0
+            ip: 36.0
+            op: 36.0
+    reflector: &block_reflector
+        reflector graphite:
+            shape: Hexagon
+            material: Graphite
+            isotopics: reflector graphite
+            Tinput: 20.0
+            Thot: 20.0
+            ip: 0.0
+            op: 36.0
+assemblies:
+    fuel column:
+        specifier: F
+        blocks: [*block_reflector, *block_fuel, *block_fuel, *block_fuel, *block_fuel, *block_fuel, *block_fuel, *block_fuel, *block_fuel, *block_fuel, *block_fuel, *block_reflector]
+        height: [198.25, 79.3, 79.3, 79.3, 79.3, 79.3, 79.3, 79.3, 79.3, 79.3, 79.3, 118.94]
+        axial mesh points: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+        xs types: [C, A, A, A, A, A, A, A, A, A, A, C]
+    RSC column 0:
+        specifier: R0
+        blocks: [*block_reflector, *block_RSC_fuel_0, *block_RSC_fuel_0, *block_RSC_fuel_0, *block_RSC_fuel_0, *block_RSC_fuel_0, *block_RSC_fuel_0, *block_RSC_fuel_0, *block_RSC_fuel_0, *block_RSC_fuel_0, *block_RSC_fuel_0, *block_reflector]
+        height: [198.25, 79.3, 79.3, 79.3, 79.3, 79.3, 79.3, 79.3, 79.3, 79.3, 79.3, 118.94]
+        axial mesh points: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+        xs types: [C, B, B, B, B, B, B, B, B, B, B, C]
+    RSC column 60:
+        specifier: R60
+        blocks: [*block_reflector, *block_RSC_fuel_60, *block_RSC_fuel_60, *block_RSC_fuel_60, *block_RSC_fuel_60, *block_RSC_fuel_60, *block_RSC_fuel_60, *block_RSC_fuel_60, *block_RSC_fuel_60, *block_RSC_fuel_60, *block_RSC_fuel_60, *block_reflector]
+        height: [198.25, 79.3, 79.3, 79.3, 79.3, 79.3, 79.3, 79.3, 79.3, 79.3, 79.3, 118.94]
+        axial mesh points: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+        xs types: [C, B, B, B, B, B, B, B, B, B, B, C]
+    RSC column 120:
+        specifier: R120
+        blocks: [*block_reflector, *block_RSC_fuel_120, *block_RSC_fuel_120, *block_RSC_fuel_120, *block_RSC_fuel_120, *block_RSC_fuel_120, *block_RSC_fuel_120, *block_RSC_fuel_120, *block_RSC_fuel_120, *block_RSC_fuel_120, *block_RSC_fuel_120, *block_reflector]
+        height: [198.25, 79.3, 79.3, 79.3, 79.3, 79.3, 79.3, 79.3, 79.3, 79.3, 79.3, 118.94]
+        axial mesh points: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+        xs types: [C, B, B, B, B, B, B, B, B, B, B, C]
+    RSC column 180:
+        specifier: R180
+        blocks: [*block_reflector, *block_RSC_fuel_180, *block_RSC_fuel_180, *block_RSC_fuel_180, *block_RSC_fuel_180, *block_RSC_fuel_180, *block_RSC_fuel_180, *block_RSC_fuel_180, *block_RSC_fuel_180, *block_RSC_fuel_180, *block_RSC_fuel_180, *block_reflector]
+        height: [198.25, 79.3, 79.3, 79.3, 79.3, 79.3, 79.3, 79.3, 79.3, 79.3, 79.3, 118.94]
+        axial mesh points: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+        xs types: [C, B, B, B, B, B, B, B, B, B, B, C]
+    RSC column 240:
+        specifier: R240
+        blocks: [*block_reflector, *block_RSC_fuel_240, *block_RSC_fuel_240, *block_RSC_fuel_240, *block_RSC_fuel_240, *block_RSC_fuel_240, *block_RSC_fuel_240, *block_RSC_fuel_240, *block_RSC_fuel_240, *block_RSC_fuel_240, *block_RSC_fuel_240, *block_reflector]
+        height: [198.25, 79.3, 79.3, 79.3, 79.3, 79.3, 79.3, 79.3, 79.3, 79.3, 79.3, 118.94]
+        axial mesh points: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+        xs types: [C, B, B, B, B, B, B, B, B, B, B, C]
+    RSC column 300:
+        specifier: R300
+        blocks: [*block_reflector, *block_RSC_fuel_300, *block_RSC_fuel_300, *block_RSC_fuel_300, *block_RSC_fuel_300, *block_RSC_fuel_300, *block_RSC_fuel_300, *block_RSC_fuel_300, *block_RSC_fuel_300, *block_RSC_fuel_300, *block_RSC_fuel_300, *block_reflector]
+        height: [198.25, 79.3, 79.3, 79.3, 79.3, 79.3, 79.3, 79.3, 79.3, 79.3, 79.3, 118.94]
+        axial mesh points: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+        xs types: [C, B, B, B, B, B, B, B, B, B, B, C]
+    reflector column:
+        specifier: RF
+        blocks: [*block_reflector, *block_reflector, *block_reflector, *block_reflector, *block_reflector, *block_reflector, *block_reflector, *block_reflector, *block_reflector, *block_reflector, *block_reflector, *block_reflector]
+        height: [198.25, 79.3, 79.3, 79.3, 79.3, 79.3, 79.3, 79.3, 79.3, 79.3, 79.3, 118.94]
+        axial mesh points: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+        xs types: [C, C, C, C, C, C, C, C, C, C, C, C]
+systems:
+    core:
+        grid name: core
+        origin:
+            x: 0.0
+            y: 0.0
+            z: 0.0
+grids:
+    core:
+        geom: hex
+        symmetry: full
+        lattice pitch:
+            hex: 36.0
+        lattice map: |
+            -       -       -       RF      RF  
+                -       -       RF      RF      RF  
+            -       -       RF      RF      RF      RF  
+                -       RF      RF      RF      RF      RF  
+            -       RF      RF      F       F       RF      RF  
+                RF      RF      F       F       F       RF      RF  
+            -       RF      F       F       F       F       RF  
+                RF      F       F       F       F       F       RF  
+            RF      RF      F       R180    R120    F       RF      RF  
+                RF      F       R180    RF      R120    F       RF  
+            RF      F       F       RF      RF      F       F       RF  
+                RF      F       RF      RF      RF      F       RF  
+            RF      F       R240    RF      RF      R60     F       RF  
+                RF      F       RF      RF      RF      F       RF  
+            RF      F       R240    RF      RF      R60     F       RF  
+                RF      F       RF      RF      RF      F       RF  
+            RF      F       F       RF      RF      F       F       RF  
+                RF      F       R300    RF      R0      F       RF  
+            RF      RF      F       R300    R0      F       RF      RF  
+                RF      F       F       F       F       F       RF  
+            -       RF      F       F       F       F       RF  
+                RF      RF      F       F       F       RF      RF  
+                    RF      RF      F       F       RF      RF  
+                        RF      RF      RF      RF      RF  
+                            RF      RF      RF      RF  
+                                RF      RF      RF  
+                                    RF      RF  
+    standard element:
+        geom: hex_corners_up
+        symmetry: full
+        lattice pitch:
+            hex: 1.8796
+        lattice map: |
+            - - - - - - - - - - L F C F F C F F C F L
+             - - - - - - - - - F C F F C F F C F F C F
+              - - - - - - - - C F F C F F C F F C F F C
+               - - - - - - - F F C F F C F F C F F C F F
+                - - - - - - F C F F C F F C F F C F F C F
+                 - - - - - C F F C F F C F F C F F C F F C
+                  - - - - F F C F F C F F C F F C F F C F F
+                   - - - F C F F C F F C F F C F F C F F C F
+                    - - C F F C F F C F F S F F C F F C F F C
+                     - F F C F F C F F S - - S F F C F F C F F
+                      L C F F C F F C F - - - F C F F C F F C L
+                       F F C F F C F F S - - S F F C F F C F F
+                        C F F C F F C F F S F F C F F C F F C
+                         F C F F C F F C F F C F F C F F C F
+                          F F C F F C F F C F F C F F C F F
+                           C F F C F F C F F C F F C F F C
+                            F C F F C F F C F F C F F C F
+                             F F C F F C F F C F F C F F
+                              C F F C F F C F F C F F C
+                               F C F F C F F C F F C F
+                                L F C F F C F F C F L
+    RSC element 0:
+        geom: hex_corners_up
+        symmetry: full
+        lattice pitch:
+            hex: 1.8796
+        lattice map: |
+            - - - - - - - - - - L F C F F C F F C F L
+             - - - - - - - - - F C F F C F F C F F C F
+              - - - - - - - - C F F C F F C F F C F F C
+               - - - - - - - F F C F F C F F C F F C F F
+                - - - - - - F C F F C F F C F F C F F C F
+                 - - - - - C F F C F F C F F C F F C F F C
+                  - - - - F F C F F C F F C F F C F F C F F
+                   - - - F C F F C F F C F F C F F C F F C F
+                    - - C F F C F F C F F S F F C F F C F F C
+                     - F F C F F C F F S - - S F F C F F C F F
+                      L C F F - - - - F - - - F C F F C F F C L
+                       F F C - - - - - S - - S F F C F F C F F
+                        C F - - - - - - F S F F C F F C F F C
+                         F - - - - - - - F F C F F C F F C F
+                          F - - - - - - F C F F C F F C F F
+                           C - - - - - C F F C F F C F F C
+                            F - - - - F F C F F C F F C F
+                             F F C F F C F F C F F C F F
+                              C F F C F F C F F C F F C
+                               F C F F C F F C F F C F
+                                L F C F F C F F C F L
+    RSC element 60:
+        geom: hex_corners_up
+        symmetry: full
+        lattice pitch:
+            hex: 1.8796
+        lattice map: |
+            - - - - - - - - - - L F C F F C F F C F L
+             - - - - - - - - - F C F F C F F C F F C F
+              - - - - - - - - C F F C F F C F F C F F C
+               - - - - - - - F F C F F C F F C F F C F F
+                - - - - - - F C F F C F F C F F C F F C F
+                 - - - - - C F F C F F C F F C F F C F F C
+                  - - - - F F C F F C F F C F F C F F C F F
+                   - - - F C F F C F F C F F C F F C F F C F
+                    - - C F F C F F C F F S F F C F F C F F C
+                     - F F C F F C F F S - - S F F C F F C F F
+                      L C F F C F F C F - - - F C F F C F F C L
+                       F F C F F C F F S - - S F F C F F C F F
+                        C F F C F F C F F S F F C F F C F F C
+                         F C F F C F F - - - - F F C F F C F
+                          F F C F F C - - - - - C F F C F F
+                           C F F C F - - - - - - F C F F C
+                            F C F F - - - - - - - F F C F
+                             F F C F - - - - - - F C F F
+                              C F F C - - - - - C F F C
+                               F C F F - - - - F F C F
+                                L F C F F C F F C F L
+    RSC element 120:
+        geom: hex_corners_up
+        symmetry: full
+        lattice pitch:
+            hex: 1.8796
+        lattice map: |
+            - - - - - - - - - - L F C F F C F F C F L
+             - - - - - - - - - F C F F C F F C F F C F
+              - - - - - - - - C F F C F F C F F C F F C
+               - - - - - - - F F C F F C F F C F F C F F
+                - - - - - - F C F F C F F C F F C F F C F
+                 - - - - - C F F C F F C F F C F F C F F C
+                  - - - - F F C F F C F F C F F C F F C F F
+                   - - - F C F F C F F C F F C F F C F F C F
+                    - - C F F C F F C F F S F F C F F C F F C
+                     - F F C F F C F F S - - S F F C F F C F F
+                      L C F F C F F C F - - - F - - - - F F C L
+                       F F C F F C F F S - - S - - - - - C F F
+                        C F F C F F C F F S F - - - - - - F C
+                         F C F F C F F C F F - - - - - - - F
+                          F F C F F C F F C F - - - - - - F
+                           C F F C F F C F F C - - - - - C
+                            F C F F C F F C F F - - - - F
+                             F F C F F C F F C F F C F F
+                              C F F C F F C F F C F F C
+                               F C F F C F F C F F C F
+                                L F C F F C F F C F L
+    RSC element 180:
+        geom: hex_corners_up
+        symmetry: full
+        lattice pitch:
+            hex: 1.8796
+        lattice map: |
+            - - - - - - - - - - L F C F F C F F C F L
+             - - - - - - - - - F C F F C F F C F F C F
+              - - - - - - - - C F F C F F C F F C F F C
+               - - - - - - - F F C F F C F F C F F C F F
+                - - - - - - F C F F C F F C F F - - - - F
+                 - - - - - C F F C F F C F F C - - - - - C
+                  - - - - F F C F F C F F C F - - - - - - F
+                   - - - F C F F C F F C F F - - - - - - - F
+                    - - C F F C F F C F F S F - - - - - - F C
+                     - F F C F F C F F S - - S - - - - - C F F
+                      L C F F C F F C F - - - F - - - - F F C L
+                       F F C F F C F F S - - S F F C F F C F F
+                        C F F C F F C F F S F F C F F C F F C
+                         F C F F C F F C F F C F F C F F C F
+                          F F C F F C F F C F F C F F C F F
+                           C F F C F F C F F C F F C F F C
+                            F C F F C F F C F F C F F C F
+                             F F C F F C F F C F F C F F
+                              C F F C F F C F F C F F C
+                               F C F F C F F C F F C F
+                                L F C F F C F F C F L
+    RSC element 240:
+        geom: hex_corners_up
+        symmetry: full
+        lattice pitch:
+            hex: 1.8796
+        lattice map: |
+            - - - - - - - - - - L F C F F C F F C F L
+             - - - - - - - - - F C F F - - - - F F C F
+              - - - - - - - - C F F C - - - - - C F F C
+               - - - - - - - F F C F - - - - - - F C F F
+                - - - - - - F C F F - - - - - - - F F C F
+                 - - - - - C F F C F - - - - - - F C F F C
+                  - - - - F F C F F C - - - - - C F F C F F
+                   - - - F C F F C F F - - - - F F C F F C F
+                    - - C F F C F F C F F S F F C F F C F F C
+                     - F F C F F C F F S - - S F F C F F C F F
+                      L C F F C F F C F - - - F C F F C F F C L
+                       F F C F F C F F S - - S F F C F F C F F
+                        C F F C F F C F F S F F C F F C F F C
+                         F C F F C F F C F F C F F C F F C F
+                          F F C F F C F F C F F C F F C F F
+                           C F F C F F C F F C F F C F F C
+                            F C F F C F F C F F C F F C F
+                             F F C F F C F F C F F C F F
+                              C F F C F F C F F C F F C
+                               F C F F C F F C F F C F
+                                L F C F F C F F C F L
+    RSC element 300:
+        geom: hex_corners_up
+        symmetry: full
+        lattice pitch:
+            hex: 1.8796
+        lattice map: |
+            - - - - - - - - - - L F C F F C F F C F L
+             - - - - - - - - - F C F F C F F C F F C F
+              - - - - - - - - C F F C F F C F F C F F C
+               - - - - - - - F F C F F C F F C F F C F F
+                - - - - - - F - - - - F F C F F C F F C F
+                 - - - - - C - - - - - C F F C F F C F F C
+                  - - - - F - - - - - - F C F F C F F C F F
+                   - - - F - - - - - - - F F C F F C F F C F
+                    - - C F - - - - - - F S F F C F F C F F C
+                     - F F C - - - - - S - - S F F C F F C F F
+                      L C F F - - - - F - - - F C F F C F F C L
+                       F F C F F C F F S - - S F F C F F C F F
+                        C F F C F F C F F S F F C F F C F F C
+                         F C F F C F F C F F C F F C F F C F
+                          F F C F F C F F C F F C F F C F F
+                           C F F C F F C F F C F F C F F C
+                            F C F F C F F C F F C F F C F
+                             F F C F F C F F C F F C F F
+                              C F F C F F C F F C F F C
+                               F C F F C F F C F F C F
+                                L F C F F C F F C F L

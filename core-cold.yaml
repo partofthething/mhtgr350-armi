@@ -1,0 +1,24 @@
+# MHTGR-350 fresh core, 20 C isothermal, rods withdrawn: full 3D core with explicit TRISO.
+settings:
+  comment: MHTGR-350 fresh core, cold isothermal, explicit TRISO
+  loadingFile: mhtgr350-blueprints.yaml
+  nCycles: 1
+  burnSteps: 0
+  power: 350000000.0
+  db: true
+  genReports: false
+  genXS: ""
+  groupStructure: ANL33
+  neutronicsKernel: OpenMC
+  openmcCrossSections: /mnt/storage/nuclear_data/openmc/endfb-viii.1-hdf5/cross_sections.xml
+  openmcParticles: 40000
+  openmcBatches: 150
+  openmcInactiveBatches: 50
+  openmcBlockModel: heterogeneous
+  openmcHeterogeneousBlockFlags: [fuel]
+  openmcParticleModel: explicit
+  openmcCoreRadius: 297.3
+  openmcOuterFill: reflector
+  openmcPlotGeometry: true
+  versions:
+    armi: uncontrolled
