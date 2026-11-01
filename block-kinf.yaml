@@ -9,6 +9,7 @@ settings:
   genReports: false
   groupStructure: ANL33
   xsKernel: OpenMC
+  xsBlockRepresentation: Median  # a real block: Average would smear the poison through the graphite
   openmcCrossSections: /mnt/storage/nuclear_data/openmc/endfb-viii.1-hdf5/cross_sections.xml
   openmcParticles: 20000
   openmcBatches: 150

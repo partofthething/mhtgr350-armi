@@ -51,21 +51,34 @@ python -m armi_openmc run core-cold.yaml                             # the whole
 
 ENDF/B-VIII.1, OpenMC 0.15.3.
 
-RESULTS_TABLE
+| Case | k | |
+|---|---|---|
+| **Full core**, burnable poison as specified (`core-cold.yaml`) | **k-eff 1.12096 ± 0.00045** | 40,000 × 150, ~25 min on 12 threads |
+| Full core, burnable poison grains without boron (`core-cold-no-lbp-boron.yaml`) | k-eff 1.42713 ± 0.00040 | |
+| Standard element, explicit TRISO (`block-kinf.yaml`) | k-inf 1.17293 ± 0.00064 | 20,000 × 150, ~15 min |
+| Standard element, compacts homogenized (`block-kinf-homogenized.yaml`) | k-inf 1.12161 ± 0.00063 | ~2 min |
+| Standard element, explicit TRISO, no LBP boron | k-inf 1.4885 ± 0.0006 | |
 
-The standard element alone (infinite lattice, the XS ID `AA` the ISOTXS files hold) shows:
+What they show:
 
 * **Double heterogeneity.** Modeling the particles instead of smearing them in their compacts is
-  worth +3009 pcm, in the range reported for prismatic HTGR fuel.
+  worth +3,901 pcm in the element, in the range reported for prismatic HTGR fuel.
 * **The cross sections close.** The k-infinity rebuilt from each ISOTXS (homogenized medium,
-  ARMI's macroscopic cross sections) is 0.89502 (explicit) and 0.87119 (homogenized), against
-  OpenMC's 0.89478 ± 0.00057 and 0.87132 ± 0.00049.
-* **The burnable poison is heavy.** Without the LBP boron the element's k-infinity is
-  1.4885 ± 0.0006: the LBPs as Table I.5 describes them hold down about 44,600 pcm when fresh,
-  far more than in a real core. The benchmark's LBP data serve its equilibrium-cycle model, in
-  which the poison has partly burned; Table I.5 does not say how much boron a fresh LBP holds,
-  and natural boron in coated B4C particles at 10.9 vol% is the reading used here (counting the
-  10.9% as B4C kernels would mean even more boron). Hence a fresh core well below critical.
+  ARMI's macroscopic cross sections) is 1.17299 (explicit) and 1.12159 (homogenized).
+* **The burnable poison** holds down 18,100 pcm in the element and 19,100 pcm in the core. The
+  fresh core with every LBP fresh is supercritical by a wide margin with all rods withdrawn, as
+  a fresh core should be: rods are not modeled here.
+* **Leakage** costs the core 3,950 pcm with poison and 2,900 pcm without, against the element's
+  infinite lattice.
+
+The full core is 163 columns, 1,956 blocks, 660 of them with explicit particles (one fuel and one
+poison compact packed, then shared): about 150,000 cells, under 0.5 GB of memory.
+
+**Representative blocks.** The element cases use `xsBlockRepresentation: Median`. ARMI's
+default `Average` representative block spreads each nuclide evenly over every component that holds
+it, which is harmless for a homogenized lattice code but here moves the poison out of the B4C
+grains and into the block graphite (it gave k-infinities of 0.895 and 0.871 instead of 1.173
+and 1.122 for the explicit and homogenized elements).
 
 ## Notes on the specification
 
